@@ -1,0 +1,30 @@
+[project]
+name = "keycloak-redirects"
+version = "0.1.0"
+description = "K8s controller that updates allowed redirect list based on ingress annotations"
+authors = [
+    { name = "Alexandru Gologan", email = "agologan@users.noreply.github.com" }
+]
+dependencies = [
+    "kubernetes>=30.0.0, <31.0.0",
+    "python-keycloak>=5.3.1",
+]
+readme = "README.md"
+requires-python = ">= 3.12"
+
+[tool.rye]
+managed = true
+virtual = true
+dev-dependencies = [
+    "kubernetes-stubs-elephant-fork>=30.0.0, <31.0.0",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+]
+
+[tool.rye.scripts]
+service = { cmd = "python src/main.py", env-file = ".env" }
+debug = { cmd = "python -m pdb src/main.py", env-file = ".env" }
+cov = { cmd = "pytest --cov=src --cov-report html"}
+
+[tool.pytest.ini_options]
+pythonpath = "src"
