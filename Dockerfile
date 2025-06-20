@@ -7,4 +7,4 @@ COPY requirements.lock ./
 RUN uv pip install --no-cache --system -r requirements.lock
 
 COPY src .
-CMD python main.py
+CMD ["python", "main.py"]
