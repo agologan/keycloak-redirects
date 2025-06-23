@@ -65,7 +65,6 @@ class EventProcessor:
         redirect: KeycloakRealmClientRedirect | None,
         event: EventType,
     ) -> set[KeycloakRealmClient]:
-        print(".", end="", flush=True)
         if event == EventType.MODIFIED:
             if ingress in self.ingresses:
                 if not redirect:
