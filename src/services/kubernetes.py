@@ -7,7 +7,10 @@ import urllib3
 
 class KubernetesService:
     def __init__(self):
-        config.load_kube_config()
+        try:
+            config.load_incluster_config()
+        except:
+            config.load_kube_config()
         self.api = client.NetworkingV1Api()
         self.service = EventProcessor()
 
