@@ -43,6 +43,11 @@ class KeycloakService:
     def __update_client(self, realm: str, client_id: str, redirects: set[str]):
         self.change_realm(realm)
         client_config = self.api.get_client(client_id)
+
+        if not client_config:
+            print(f"Client {client_id} not found in realm {realm}.")
+            return
+
         client_config["redirectUris"] = list(redirects)
 
         if self.dry_run:
