@@ -65,6 +65,7 @@ class EventProcessor:
         redirect: KeycloakRealmClientRedirect | None,
         event: EventType,
     ) -> set[KeycloakRealmClient]:
+        print(".", end="", flush=True)
         if event == EventType.MODIFIED:
             if ingress in self.ingresses:
                 if not redirect:
@@ -118,9 +119,9 @@ class EventProcessor:
         new_redirect: KeycloakRealmClientRedirect | None = None
 
         if metadata.annotations:
-            realm = metadata.annotations[Annotations.REALM]
-            client = metadata.annotations[Annotations.CLIENT]
-            redirect_uri = metadata.annotations[Annotations.REDIRECT_URI]
+            realm = metadata.annotations.get(Annotations.REALM)
+            client = metadata.annotations.get(Annotations.CLIENT)
+            redirect_uri = metadata.annotations.get(Annotations.REDIRECT_URI)
 
             if realm and client and redirect_uri:
                 new_redirect = KeycloakRealmClientRedirect(realm, client, redirect_uri)
