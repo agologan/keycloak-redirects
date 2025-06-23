@@ -64,6 +64,7 @@ class KeycloakService:
 
             if not client_config:
                 print(f"{client.realm}/{client.name} not in config. ignoring update.")
+                continue
 
             if client_config["enabled"] != True:
                 print(f"{client.realm}/{client.name} disabled. ignoring update.")
