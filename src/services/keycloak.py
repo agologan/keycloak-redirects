@@ -1,5 +1,5 @@
 from .events import KeycloakRealmClient
-from keycloak import KeycloakAdmin, KeycloakOpenIDConnection
+from keycloak import KeycloakAdmin, KeycloakGetError, KeycloakOpenIDConnection
 from utils.unwrap import unwrap
 import os
 
@@ -11,43 +11,63 @@ class KeycloakService:
         client_secret = unwrap(os.getenv("KEYCLOAK_CLIENT_SECRET"))
         self.dry_run = os.getenv("DRY_RUN", "false") == "true"
 
-        self.apis = {}
-        for realm in config["realms"]:
-            self.apis[realm] = KeycloakAdmin(
-                server_url=server_url,
-                client_id=client_id,
-                client_secret_key=client_secret,
-                verify=True,
-            )
+        self.api = KeycloakAdmin(
+            server_url=server_url,
+            client_id=client_id,
+            client_secret_key=client_secret,
+            realm_name="master",
+            verify=True,
+        )
 
         self.__cache_clients(config)
+        self.config = config
+
+    def change_realm(self, realm: str):
+        self.api.change_current_realm("master")
+        self.api.connection._refresh_if_required()
+        self.api.change_current_realm(realm)
 
     def __cache_clients(self, config):
         self.client_map = {}
-        for realm in config["realms"]:
+        for realm in config:
             self.client_map[realm] = {}
-            for client in self.apis[realm].get_clients():
-                self.client_map[realm][client.clientId] = client.id
+            self.change_realm(realm)
+            try:
+                for client in self.api.get_clients():
+                    self.client_map[realm][client["clientId"]] = client["id"]
+            except KeycloakGetError as e:
+                print(f"Error fetching clients for realm {realm}: {e}")
+                exit(1)
 
-    def __update_client(self, api: KeycloakAdmin, client_id: str, redirects: set[str]):
-        client_config = api.get_client(client_id)
+    def __update_client(self, realm: str, client_id: str, redirects: set[str]):
+        self.change_realm(realm)
+        client_config = self.api.get_client(client_id)
         client_config["redirectUris"] = list(redirects)
 
         if self.dry_run:
             print(f"Updating {client_id} {redirects}")
         else:
-            api.update_client(client_id, client_config)
+            self.api.update_client(client_id, client_config)
 
     def update_redirects(
         self,
         redirects: dict[KeycloakRealmClient, set[str]],
     ):
         for client, redirect_list in redirects.items():
-            if client.realm not in self.client_map:
-                print(f"{client.realm} not in config. ignoring {client.name} update.")
+            client_config = self.config.get(client.realm, {}).get(client.name)
+
+            if not client_config:
+                print(f"{client.realm}/{client.name} not in config. ignoring update.")
+
+            if client_config["enabled"] != True:
+                print(f"{client.realm}/{client.name} disabled. ignoring update.")
+                continue
+
+            if client_config["loopback"] == True:
+                redirect_list.add("http://localhost:*")
 
             client_id = self.client_map[client.realm].get(client.name)
             if client_id:
-                self.__update_client(self.apis[client.realm], client_id, redirect_list)
+                self.__update_client(client.realm, client_id, redirect_list)
             else:
                 print(f"{client.name} missing from cache")
