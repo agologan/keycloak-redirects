@@ -50,9 +50,8 @@ class KeycloakService:
 
         client_config["redirectUris"] = list(redirects)
 
-        if self.dry_run:
-            print(f"Updating {client_id} {redirects}")
-        else:
+        print(f"Updating {client_id} {redirects}")
+        if not self.dry_run:
             self.api.update_client(client_id, client_config)
 
     def update_redirects(
