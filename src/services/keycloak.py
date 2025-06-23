@@ -7,6 +7,7 @@ import os
 class KeycloakService:
     def __init__(self, config):
         server_url = unwrap(os.getenv("KEYCLOAK_HOST"))
+        self.realm = unwrap(os.getenv("KEYCLOAK_REALM", default="master"))
         client_id = unwrap(os.getenv("KEYCLOAK_CLIENT_ID"))
         client_secret = unwrap(os.getenv("KEYCLOAK_CLIENT_SECRET"))
         self.dry_run = os.getenv("DRY_RUN", "false") == "true"
@@ -15,7 +16,7 @@ class KeycloakService:
             server_url=server_url,
             client_id=client_id,
             client_secret_key=client_secret,
-            realm_name="master",
+            realm_name=self.realm,
             verify=True,
         )
 
@@ -23,7 +24,7 @@ class KeycloakService:
         self.config = config
 
     def change_realm(self, realm: str):
-        self.api.change_current_realm("master")
+        self.api.change_current_realm(self.realm)
         self.api.connection._refresh_if_required()
         self.api.change_current_realm(realm)
 
