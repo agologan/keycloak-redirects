@@ -1,0 +1,54 @@
+replicaCount: 1
+image:
+  repository: ghcr.io/agologan/keycloak-redirects
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+env: {}
+  # - name: KEYCLOAK_HOST
+  #   value: ""
+  # - name: KEYCLOAK_CLIENT_ID
+  #   value: ""
+  # - name: KEYCLOAK_CLIENT_SECRET
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: keycloak-client-secret
+  #       key: client-secret
+
+config: null
+# config: |
+#   [realm1.client1]
+#   enabled = true
+#   loopback = true
+#   [realm2.client1]
+#   enabled = true
+#   loopback = false
+
+serviceAccount:
+  create: true
+  annotations: {}
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+resources: {}
+
+autoscaling:
+  enabled: false
+  # minReplicas: 1
+  # maxReplicas: 5
+  # targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

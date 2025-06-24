@@ -1,0 +1,6 @@
+apiVersion: v2
+name: keycloak-redirect-controller
+description: K8s controller that updates allowed redirect list based on ingress annotations
+type: application
+version: 0.1.0
+appVersion: "latest"

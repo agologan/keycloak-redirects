@@ -4,10 +4,14 @@ on:
   push:
     branches:
       - main
+    paths:
+      - src/**
+      - .github/workflows/build.yml
+      - requirements.lock
+      - Dockerfile
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: agologan/keycloak-redirects
 
 jobs:
   build:
@@ -40,7 +44,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ github.repository }}
           tags: |
             type=sha,prefix=
 
