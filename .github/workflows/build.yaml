@@ -6,9 +6,9 @@ on:
       - main
     paths:
       - src/**
-      - .github/workflows/build.yml
       - requirements.lock
       - Dockerfile
+      - .github/workflows/build.yaml
 
 env:
   REGISTRY: ghcr.io
