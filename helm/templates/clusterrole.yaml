@@ -2,8 +2,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: {{ include "keycloak-redirect-controller.fullname" . }}
-labels:
-    {{- include "keycloak-redirect-controller.labels" . | nindent 4 }}
+  labels:
+      {{- include "keycloak-redirect-controller.labels" . | nindent 4 }}
 rules:
   - apiGroups: ["networking.k8s.io"]
     resources: ["ingresses"]
