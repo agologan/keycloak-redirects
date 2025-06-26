@@ -51,9 +51,9 @@ spec:
               mountPath: /app/config.toml
               subPath: config.toml
       volumes:
-        name: config
-        configMap:
-          name: {{ include "keycloak-redirect-controller.fullname" . }}-config
+        - name: config
+          configMap:
+            name: {{ include "keycloak-redirect-controller.fullname" . }}-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
