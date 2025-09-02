@@ -16,15 +16,17 @@ class KubernetesService:
 
     def start(self, callback):
         assert callback != None
-
-        ingress_list = self.api.list_ingress_for_all_namespaces()
-        modified = self.service.process_k8s_ingress_list(ingress_list.items)
-        callback(self.service.redirects_for_clients(modified))
-
-        resource_version = unwrap(ingress_list.metadata).resource_version
+        resource_version = None
 
         while True:
             try:
+                if resource_version is None:
+                    ingress_list = self.api.list_ingress_for_all_namespaces()
+                    modified = self.service.process_k8s_ingress_list(ingress_list.items)
+                    callback(self.service.redirects_for_clients(modified))
+
+                    resource_version = unwrap(ingress_list.metadata).resource_version
+
                 w = watch.Watch()
                 for event in w.stream(
                     self.api.list_ingress_for_all_namespaces,
