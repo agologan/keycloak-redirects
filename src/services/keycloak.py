@@ -48,7 +48,7 @@ class KeycloakService:
             print(f"Client {client_id} not found in realm {realm}.")
             return
 
-        client_config["redirectUris"] = list(redirects).sort()
+        client_config["redirectUris"] = sorted(redirects)
 
         print(f"Updating {client_id} {redirects}")
         if not self.dry_run:
