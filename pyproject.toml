@@ -12,19 +12,13 @@ dependencies = [
 readme = "README.md"
 requires-python = ">= 3.12"
 
-[tool.rye]
-managed = true
-virtual = true
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "kubernetes-stubs-elephant-fork>=30.0.0, <31.0.0",
     "pytest>=8.3.4",
     "pytest-cov>=6.0.0",
+    "ruff>=0.12.7",
 ]
-
-[tool.rye.scripts]
-service = { cmd = "python src/main.py", env-file = ".env" }
-debug = { cmd = "python -m pdb src/main.py", env-file = ".env" }
-cov = { cmd = "pytest --cov=src --cov-report html"}
 
 [tool.pytest.ini_options]
 pythonpath = "src"
