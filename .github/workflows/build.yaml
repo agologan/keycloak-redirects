@@ -23,12 +23,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
-          cache: 'pip'
+          python-version-file: ".python-version"
 
-      - run: pip install -r requirements-dev.lock
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
 
-      - run: python -m pytest
+      - run: uv sync
+
+      - run: uv run pytest
 
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v3
