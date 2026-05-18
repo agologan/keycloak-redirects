@@ -1,6 +1,9 @@
-from .events import EventProcessor, EventType, KeycloakRealmClient
+from .events import EventProcessor, EventType
 from kubernetes import client, config, watch
+from kubernetes.client.api_client import ApiClient
+import ssl
 from kubernetes.client.exceptions import ApiException
+from kubernetes.config.config_exception import ConfigException
 from utils.unwrap import unwrap
 import urllib3
 
@@ -9,13 +12,32 @@ class KubernetesService:
     def __init__(self):
         try:
             config.load_incluster_config()
-        except:
+        except ConfigException:
             config.load_kube_config()
-        self.api = client.NetworkingV1Api()
+
+
+
+        self.api = client.NetworkingV1Api(api_client=self.patched_api_client())
         self.service = EventProcessor()
 
+    def patched_api_client(self):
+        api_client = ApiClient()
+
+        # @see https://github.com/kubernetes-client/python/issues/2394#issuecomment-3460128887
+        # disable VERIFY_X509_STRICT when using urllib3 v2.4.0 with Python 3.13 on EKS
+        ctx = ssl.create_default_context()
+        ctx.verify_flags = ctx.verify_flags & ~ssl.VERIFY_X509_STRICT
+
+        api_client.rest_client.pool_manager = urllib3.PoolManager(
+            num_pools=4,
+            ssl_context=ctx,
+            **api_client.rest_client.pool_manager.connection_pool_kw,
+        )
+
+        return api_client
+
     def start(self, callback):
-        assert callback != None
+        assert callback is not None
         resource_version = None
 
         while True:
