@@ -1,4 +1,5 @@
-FROM python:3.13.2-alpine
+# https://github.com/kubernetes-client/python/issues/2394
+FROM python:3.12.13-alpine
 
 RUN adduser -S -u 1000 py
 
