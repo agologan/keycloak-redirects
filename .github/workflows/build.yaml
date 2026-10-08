@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - src/**
-      - requirements.lock
+      - uv.lock
       - Dockerfile
       - .github/workflows/build.yaml
 
